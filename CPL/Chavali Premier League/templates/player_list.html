@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>CPL</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f7f7f7;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .teams-container {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .team-box {
+            border: 2px solid #ccc;
+            padding: 20px;
+            width: 220px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, #ffffff, #f0f0f0);
+            cursor: pointer;
+        }
+
+        /* Team Name Colors */
+        .royal .team-name {
+            color: #e74c3c; /* Red */
+        }
+
+        .super .team-name {
+            color: #f1c40f; /* Yellow */
+        }
+
+        .sun .team-name {
+            color: #f39c12; /* Orange */
+        }
+
+        .team-name {
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .team-info {
+            font-size: 16px;
+            margin-top: 5px;
+            color: #555;
+            transition: all 0.3s ease;
+        }
+
+        /* Hover effect for all teams */
+        .team-box:hover {
+            background-color: black;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .team-box:hover .team-name {
+            color: white !important;
+        }
+
+        .players-button {
+            padding: 12px 25px;
+            font-size: 18px;
+            background: linear-gradient(45deg, #6a11cb, #2575fc);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .players-button:hover {
+            background: linear-gradient(45deg, #2575fc, #6a11cb);
+            transform: scale(1.05);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        #playerTable {
+            display: none;
+            margin-top: 20px;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        table {
+            margin: 0 auto;
+            border-collapse: collapse;
+            width: 80%;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #6a11cb;
+            color: white;
+        }
+
+        td a {
+            text-decoration: none;
+            color: #2575fc;
+            font-weight: bold;
+        }
+
+        td a:hover {
+            text-decoration: underline;
+            color: #6a11cb;
+        }
+    </style>
+
+    <script>
+        function togglePlayerList() {
+            var table = document.getElementById('playerTable');
+            table.style.display = table.style.display === 'none' ? 'block' : 'none';
+        }
+    </script>
+</head>
+
+<body>
+    <h1>Chavali Premier League</h1>
+
+    <div class="teams-container">
+        <div class="team-box royal">
+            <div class="team-name">Royal Challengers</div>
+            <div class="team-info">Points Left: {{ teams[0].points }}</div>
+        </div>
+
+        <div class="team-box super">
+            <div class="team-name">Super Kings</div>
+            <div class="team-info">Points Left: {{ teams[1].points }}</div>
+        </div>
+
+        <div class="team-box sun">
+            <div class="team-name">Sun Risers</div>
+            <div class="team-info">Points Left: {{ teams[2].points }}</div>
+        </div>
+    </div>
+
+    <button class="players-button" onclick="togglePlayerList()">Players List</button>
+
+    <div id="playerTable">
+        <h2>Player List</h2>
+        <table>
+            <tr>
+                <th>Player ID</th>
+                <th>Player Name</th>
+                <th>Status</th>
+            </tr>
+            {% for player in players %}
+                <tr>
+                    <td>{{ player.player_id }}</td>
+                    <td>{{ player.name }}</td>
+                    <td>
+                        {% if player.no_bid %}
+                            No Bid (Available for Re-Bid)
+                            <a href="{{ url_for('player_profile', player_id=player.player_id) }}">Re-Bid</a>
+                        {% elif player.team_id %}
+                            {% set team = teams | selectattr('team_id', 'equalto', player.team_id) | list | first %}
+                            Owned by {{ team.team_name }}
+                        {% else %}
+                            <a href="{{ url_for('player_profile', player_id=player.player_id) }}">Bid Now</a>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+</body>
+
+</html>
